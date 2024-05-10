@@ -6,6 +6,17 @@ public class CellDependencyGraph {
     private final Map<Cell, Set<Cell>> cellDependencyGraph = new HashMap<>();
     private final Map<Cell, Set<Cell>> inverseCellDependencyGraph = new HashMap<>();
 
+    public CellDependencyGraph() {}
+
+    public CellDependencyGraph(CellDependencyGraph another) {
+        for (Map.Entry<Cell, Set<Cell>> entry : another.cellDependencyGraph.entrySet()) {
+            cellDependencyGraph.put(entry.getKey(), new HashSet<>(entry.getValue()));
+        }
+        for (Map.Entry<Cell, Set<Cell>> entry : another.inverseCellDependencyGraph.entrySet()) {
+            inverseCellDependencyGraph.put(entry.getKey(), new HashSet<>(entry.getValue()));
+        }
+    }
+
     public boolean addDependency(Cell independent, Cell dependent) {
 
         if (createsCycle(dependent, independent)) {

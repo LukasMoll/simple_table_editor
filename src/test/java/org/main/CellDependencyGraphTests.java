@@ -2,6 +2,9 @@ package org.main;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import javax.swing.*;
+
 import static org.junit.Assert.*;
 
 import java.util.Arrays;
@@ -66,3 +69,6 @@ public class CellDependencyGraphTests {
         assertTrue(graph.getAllDependents(cellB).isEmpty());
     }
 }
+
+
+

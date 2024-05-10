@@ -118,7 +118,7 @@ public class NamedFunctionsTests {
 
     @Test
     public void testMinFunction() {
-        String input = "MIN(1, 2, 3)";
+        String input = "MIN(4, 1, 2, 3)";
         Parser parser = new Parser(input, null);
 
         Expr expression = parser.parse();

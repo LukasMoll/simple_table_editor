@@ -8,20 +8,26 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.util.HashMap;
-import java.util.Map;
+import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.awt.Toolkit;
+import java.util.*;
 
 
 public class SimpleTableEditor extends JFrame {
     private int editingRow = -1;
     private int editingColumn = -1;
-    private final Map<Cell, String> originalCellValue = new HashMap<>();
-    private final Map<Cell, String> calculatedCellValue = new HashMap<>();
+    private Map<Cell, String> originalCellValue = new HashMap<>();
+    private Map<Cell, String> calculatedCellValue = new HashMap<>();
     private Cell lastSelectedCell = null;
     private CellDependencyGraph dependencyGraph = new CellDependencyGraph();
     private final Frame frame;
     private final JTable table;
     private Cell currentCell = null;
+    private final ArrayDeque<Map<Cell, String>> originalCellValueHistory = new ArrayDeque<>();
+    private final ArrayDeque<Map<Cell, String>> calculatedCellValueHistory = new ArrayDeque<>();
+    private final ArrayDeque<CellDependencyGraph> dependencyGraphHistory = new ArrayDeque<>();
 
 
     public SimpleTableEditor(Frame frame) {
@@ -31,6 +37,10 @@ public class SimpleTableEditor extends JFrame {
         setSize(800, 600);
         setLocationRelativeTo(null);
 
+        originalCellValueHistory.push(new HashMap<>());
+        calculatedCellValueHistory.push(new HashMap<>());
+        dependencyGraphHistory.push(new CellDependencyGraph());
+
         var model = createTableModel(frame.getColumnLabels(), frame.getRowLabels());
         fillRowLabels(model, frame.getRowLabels());
 
@@ -38,6 +48,77 @@ public class SimpleTableEditor extends JFrame {
         setupTable();
         var scrollPane = new JScrollPane(table);
         getContentPane().add(scrollPane, BorderLayout.CENTER);
+        setupKeyBindings();
+    }
+
+    private void setupKeyBindings() {
+        String os = System.getProperty("os.name").toLowerCase();
+        KeyStroke undoKeyStroke;
+        if (os.contains("mac")) {
+            undoKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx());
+        } else {
+            undoKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK);
+        }
+
+        // Bind the keystroke to an "undo" action
+        table.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(undoKeyStroke, "undoAction");
+        table.getActionMap().put("undoAction", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("Undo triggered");  // Debugging line
+                undo();
+            }
+        });
+    }
+
+
+    private void saveState() {
+        if (originalCellValueHistory.size() >= 20) {
+            originalCellValueHistory.removeLast();
+            calculatedCellValueHistory.removeLast();
+            dependencyGraphHistory.removeLast();
+        }
+        originalCellValueHistory.addFirst(new HashMap<>(originalCellValue));
+        calculatedCellValueHistory.addFirst(new HashMap<>(calculatedCellValue));
+        dependencyGraphHistory.addFirst(new CellDependencyGraph(dependencyGraph));
+    }
+
+    private void recoverState() {
+        if (originalCellValueHistory.isEmpty()) {
+            return;
+        }
+        // Peek the most recent state without removing it
+        Map<Cell, String> original = originalCellValueHistory.peekFirst();
+        Map<Cell, String> calculated = calculatedCellValueHistory.peekFirst();
+
+        // Apply the most recent state to the current view
+        original.forEach((cell, value) -> {
+            assert calculated != null;
+            table.getModel().setValueAt(calculated.get(cell), cell.row(), cell.column());
+        });
+    }
+
+    private void undo() {
+        if (originalCellValueHistory.size() > 1) {
+            originalCellValueHistory.removeFirst();
+            calculatedCellValueHistory.removeFirst();
+            dependencyGraphHistory.removeFirst();
+        }
+        originalCellValue = new HashMap<>(originalCellValueHistory.getFirst());
+        calculatedCellValue = new HashMap<>(calculatedCellValueHistory.getFirst());
+        dependencyGraph = new CellDependencyGraph(dependencyGraphHistory.getFirst());
+        refreshTable();
+    }
+
+    private void refreshTable() {
+        for (int i = 0; i < table.getRowCount(); i++) {
+            for (int j = 1; j < table.getColumnCount(); j++) {
+                table.getModel().setValueAt("", i, j);
+            }
+        }
+        for (var cell : originalCellValue.keySet()) {
+            table.getModel().setValueAt(calculatedCellValue.get(cell), cell.row(), cell.column());
+        }
     }
 
     private DefaultTableModel createTableModel(String[] columnLabels, String[] rowLabels) {
@@ -132,8 +213,9 @@ public class SimpleTableEditor extends JFrame {
     private void handleEditingFinalized(int row, int column, Object value) {
         var currentValue = table.getModel().getValueAt(row, column);
         System.out.println("Current value at [" + row + ", " + column + "]: " + currentValue);
+        var selectedCell = new Cell(row, column);
         try {
-            var selectedCell = new Cell(row, column);
+            dependencyGraph.removeDependent(selectedCell);
             String input = value.toString();
             if (input.trim().isEmpty()) {
                 table.getModel().setValueAt("", row, column);
@@ -146,7 +228,6 @@ public class SimpleTableEditor extends JFrame {
                 }
                 return;
             }
-            dependencyGraph.removeDependent(selectedCell);
             var dependents = dependencyGraph.getAllDependents(selectedCell);
 
             parseCell(input, row, column);
@@ -156,9 +237,26 @@ public class SimpleTableEditor extends JFrame {
             System.out.println("Edited value at [" + row + ", " + column + "]: " + value);
         } catch (RuntimeException e) {
             System.err.println("Failed to parse and evaluate expression: " + e.getMessage());
+            recoverState();
             table.getModel().setValueAt(value, row, column);
             calculatedCellValue.put(new Cell(row, column), "error");
             originalCellValue.put(new Cell(row, column), value.toString());
+            var dependents = dependencyGraph.getAllDependents(selectedCell);
+            for (var dependent : dependents) {
+                table.getModel().setValueAt("error", dependent.row(), dependent.column());
+                calculatedCellValue.put(new Cell(dependent.row(), dependent.column()), "error");
+            }
+        } finally {
+            if (
+                    calculatedCellValueHistory.isEmpty() ||
+                    !calculatedCellValue.equals(calculatedCellValueHistory.getFirst()) ||
+                    !originalCellValue.equals(originalCellValueHistory.getFirst())
+            ) {
+                saveState();
+                System.out.println("State saved");
+            } else {
+                System.out.println("State not saved: no changes detected");
+            }
         }
     }
 

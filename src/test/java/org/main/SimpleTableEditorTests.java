@@ -4,12 +4,17 @@ import org.assertj.swing.fixture.FrameFixture;
 import org.assertj.swing.junit.testcase.AssertJSwingJUnitTestCase;
 import org.assertj.swing.edt.GuiActionRunner;
 import org.assertj.swing.fixture.JTableFixture;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
+
+import javax.swing.*;
 
 import static org.assertj.swing.data.TableCell.row;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 
+import java.awt.*;
 import java.awt.event.KeyEvent;
 
 
