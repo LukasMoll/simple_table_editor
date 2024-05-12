@@ -21,10 +21,10 @@ public class CellDependencyGraphTests {
     @Before
     public void setUp() {
         graph = new CellDependencyGraph();
-        cellA = new Cell(0, 1);
-        cellB = new Cell(0, 2);
-        cellC = new Cell(0, 3);
-        cellD = new Cell(0, 4);
+        cellA = new Cell(0, 1, "", "", graph, null, null);
+        cellB = new Cell(0, 2, "", "", graph, null, null);
+        cellC = new Cell(0, 3, "", "", graph, null, null);
+        cellD = new Cell(0, 4, "", "", graph, null, null);
     }
 
     @Test

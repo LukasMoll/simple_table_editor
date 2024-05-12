@@ -1,11 +1,9 @@
 package org.parser;
 
 import org.main.Cell;
-import org.main.Frame;
-import org.main.SimpleTableEditor;
 
 import java.util.List;
-import java.util.Map;
+
 
 public interface Expr {
     double evaluate();
@@ -179,18 +177,16 @@ class FunctionExpr implements Expr {
 }
 
 class CellExpr implements Expr {
-    private final SimpleTableEditor simpleTableEditor;
     private final String cellRef;
+    private final Cell cell;
 
-    public CellExpr(SimpleTableEditor simpleTableEditor, String cellRef) {
-        this.simpleTableEditor = simpleTableEditor;
+    public CellExpr(Cell cell, String cellRef) {
+        this.cell = cell;
         this.cellRef = cellRef;
     }
 
     @Override
     public double evaluate() {
-        Frame frame = simpleTableEditor.getFrame();
-
         // Decode column index from Excel-like reference
         String rowLabel = "";
         String columnLabel = "";
@@ -208,21 +204,22 @@ class CellExpr implements Expr {
         if (rowLabel.isEmpty() || columnLabel.isEmpty()) {
             throw new IllegalArgumentException("Invalid cell reference: " + cellRef);
         }
-        int column = frame.getColumnLabelToColumn().get(columnLabel); // Extract and decode column letters
-        int row = Integer.parseInt(rowLabel) - 1; // Extract and decode row number
+        var tableModel = cell.getTableModel();
+        int row = tableModel.rowLabelToRow(rowLabel);
+        int column = tableModel.columnLabelToColumn(columnLabel);
+        Cell referencedCell = tableModel.getCell(row, column);
 
-        // Fetch the cell value from the JTable within the SimpleTableEditor
-        Object cellValue = simpleTableEditor.getTable().getValueAt(row, column);
-        if (cellValue == null) {
-            throw new IllegalArgumentException("Empty cell value at " + cellRef);
-        }
+        String cellValue = referencedCell.getParsedValue();
         try {
-            var result = Double.parseDouble(cellValue.toString());
-            boolean noCycle = simpleTableEditor.getDependencyGraph().addDependency(new Cell(row, column), simpleTableEditor.getCurrentCell());
+            boolean noCycle = cell.getCellDependencyGraph().addDependency(referencedCell, cell);
             if (!noCycle) {
+                tableModel.setCellParsedValue(row, column, null);
                 throw new IllegalArgumentException("Cycle detected in cell dependencies");
             }
-            return result;
+            if (cellValue.isEmpty()) {
+                throw new IllegalArgumentException("Empty cell value at " + cellRef);
+            }
+            return Double.parseDouble(cellValue);
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Non-numeric cell value at " + cellRef);
         }
@@ -243,7 +240,7 @@ class UnaryExpr implements Expr {
     @Override
     public double evaluate() {
         if (operator == '-') {
-            return -expr.evaluate(); // Negation
+            return -expr.evaluate();
         }
         throw new IllegalArgumentException("Unsupported unary operator: " + operator);
     }

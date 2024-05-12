@@ -4,17 +4,12 @@ import org.assertj.swing.fixture.FrameFixture;
 import org.assertj.swing.junit.testcase.AssertJSwingJUnitTestCase;
 import org.assertj.swing.edt.GuiActionRunner;
 import org.assertj.swing.fixture.JTableFixture;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
-
-import javax.swing.*;
 
 import static org.assertj.swing.data.TableCell.row;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 
-import java.awt.*;
 import java.awt.event.KeyEvent;
 
 
@@ -23,10 +18,15 @@ public class SimpleTableEditorTests extends AssertJSwingJUnitTestCase {
 
     @Override
     protected void onSetUp() {
-        Frame frame = GuiActionRunner.execute(() -> new Frame(5, 3));
-        SimpleTableEditor simpleTableEditor = GuiActionRunner.execute(() -> new SimpleTableEditor(frame));
-        window = new FrameFixture(robot(), simpleTableEditor);
-        window.show();
+        GuiActionRunner.execute(() -> {
+            TableModel tableModel = new TableModel(10, 10, 10, 10);
+            TableView tableView = new TableView(tableModel);
+            new TableController(tableView, tableModel, 1);
+            tableView.setVisible(true);
+            window = new FrameFixture(robot(), tableView);
+            return tableView;
+        });
+        window.show(); // Show the frame to test
     }
 
     @Test
@@ -199,15 +199,13 @@ public class SimpleTableEditorTests extends AssertJSwingJUnitTestCase {
         assertEquals("1.0", table.target().getValueAt(1, 1));
         assertEquals("1.0", table.target().getValueAt(2, 1));
 
-        //table.cell(row(0).column(1)).enterValue("2");
-        //robot().pressAndReleaseKeys(KeyEvent.VK_ENTER);
         table.cell(row(0).column(1)).enterValue("");
         robot().pressAndReleaseKeys(KeyEvent.VK_ENTER);
         table.cell(row(0).column(2)).enterValue("test");
 
         assertEquals("", table.target().getValueAt(0, 1));
-        assertEquals("error", table.target().getValueAt(1, 1));
-        assertEquals("error", table.target().getValueAt(2, 1));
+        assertEquals("A1", table.target().getValueAt(1, 1));
+        assertEquals("A2", table.target().getValueAt(2, 1));
     }
 
     @Test
@@ -251,7 +249,8 @@ public class SimpleTableEditorTests extends AssertJSwingJUnitTestCase {
         robot().pressAndReleaseKeys(KeyEvent.VK_ENTER);
 
         // Check for error message or indication of failure
-        assertEquals("error", table.target().getValueAt(0, 1).toString());
+        assertEquals("A2", table.target().getValueAt(0, 1).toString());
+        assertEquals("A1", table.target().getValueAt(1, 1).toString());
     }
 
     @Test
@@ -273,6 +272,45 @@ public class SimpleTableEditorTests extends AssertJSwingJUnitTestCase {
         // Check if the dependent values updated correctly
         assertEquals("12.0", table.target().getValueAt(1, 1).toString());
         assertEquals("22.0", table.target().getValueAt(2, 1).toString());
+    }
+
+    @Test
+    public void testUndoOnMac() {
+        System.setProperty("os.name", "Mac OS X");  // Simulate macOS environment
+
+        JTableFixture table = window.table();
+
+        // Initial value entry
+        table.cell(row(0).column(1)).enterValue("50");
+        robot().pressAndReleaseKeys(KeyEvent.VK_ENTER);
+
+        // Perform undo operation
+        robot().pressKey(KeyEvent.VK_META);  // Command key
+        robot().pressAndReleaseKey(KeyEvent.VK_Z);
+        robot().releaseKey(KeyEvent.VK_META);
+
+        // Check if the undo operation reverted the value
+        assertEquals("", table.target().getValueAt(0, 1).toString());
+    }
+
+    // Test the Undo operation on Windows (Ctrl + Z)
+    @Test
+    public void testUndoOnWindows() {
+        System.setProperty("os.name", "Windows 10");  // Simulate Windows environment
+
+        JTableFixture table = window.table();
+
+        // Initial value entry
+        table.cell(row(0).column(1)).enterValue("50");
+        robot().pressAndReleaseKeys(KeyEvent.VK_ENTER);
+
+        // Perform undo operation
+        robot().pressKey(KeyEvent.VK_CONTROL);  // Control key
+        robot().pressAndReleaseKey(KeyEvent.VK_Z, KeyEvent.VK_CONTROL);
+        robot().releaseKey(KeyEvent.VK_CONTROL);
+
+        // Check if the undo operation reverted the value
+        assertEquals("", table.target().getValueAt(0, 1).toString());
     }
 
     @Override

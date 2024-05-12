@@ -1,21 +1,18 @@
 package org.parser;
 
-import org.main.SimpleTableEditor;
+import org.main.Cell;
 
-import javax.swing.*;
 import java.util.*;
 
+
 public class Parser {
-    private final StringTokenizer tokenizer;
+    private StringTokenizer tokenizer;
     private String currentToken;
     private int openParentheses = 0; // Track the number of unclosed '('
-    private final SimpleTableEditor simpleTableEditor;
+    private Cell cell;
 
-    public Parser(String input, SimpleTableEditor simpleTableEditor) {
-        tokenizer = new StringTokenizer(input, "+-*/() ,", true);
-        nextToken();
-        this.simpleTableEditor = simpleTableEditor;
-    }
+
+    public Parser() {}
 
     private void nextToken() {
         while (tokenizer.hasMoreTokens()) {
@@ -27,7 +24,14 @@ public class Parser {
         currentToken = null;
     }
 
-    public Expr parse() {
+    public Expr parse(Cell cell) {
+        this.cell = cell;
+        var value = cell.getValue();
+        if (value.isEmpty()) {
+            throw new RuntimeException("Empty cell");
+        }
+        tokenizer = new StringTokenizer(value, "+-*/() ,", true);
+        nextToken();
         if (currentToken == null) {
             // Return a default expression or handle the empty input specifically.
             return new NumberExpr(0);  // Example: return 0 for empty input.
@@ -83,7 +87,7 @@ public class Parser {
         } else if (Character.isLetter(currentToken.charAt(0)) && currentToken.length() > 1 && Character.isDigit(currentToken.charAt(1))) {
             var cellRef = currentToken;
             nextToken();
-            return new CellExpr(this.simpleTableEditor, cellRef);
+            return new CellExpr(cell, cellRef);
         } else if (currentToken.matches("[-+]?\\d*\\.?\\d+")) {
             var number = Double.parseDouble(currentToken);
             nextToken();
