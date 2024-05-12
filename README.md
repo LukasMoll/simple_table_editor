@@ -2,6 +2,8 @@
 
 SimpleTableEditor is a lightweight Java-based application designed to facilitate the editing of tabular data with embedded formula support. The application leverages the Swing tableModelwork to provide a straightforward user interface for table manipulation directly within cell inputs, without the need for a separate formula input field.
 
+![Alt text](showcase.gif)
+
 ## Features
 
 SimpleTableEditor supports a range of formula capabilities that allow users to perform complex data manipulations directly within the table cells. Below, we detail the types of operations and functions available.
