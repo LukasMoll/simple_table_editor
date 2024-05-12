@@ -101,7 +101,6 @@ SimpleTableEditor employs two main design patterns to ensure a robust and scalab
 ## Setup
 
 - **Requirements:** Java 23
-- **IDE:** Tested on IntelliJ IDEA
 - **Execution:** Run `Main` with arguments `<width>`, `<height>`, `<screen width>`, `<screen height>` and `<max history>` to define the table dimensions and the maximum undo history.
 - **Tested on:** macOS with Java 23 and IntelliJ IDEA
 
