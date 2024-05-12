@@ -101,5 +101,22 @@ SimpleTableEditor employs two main design patterns to ensure a robust and scalab
 
 - **Requirements:** Java 23
 - **IDE:** Tested on IntelliJ IDEA
-- **Execution:** Run `SimpleTableEditor` with arguments `<width>`, `<height>`, `<screen width>`, `<screen height>` and `<max history>` to define the table dimensions and the maximum undo history.
+- **Execution:** Run `Main` with arguments `<width>`, `<height>`, `<screen width>`, `<screen height>` and `<max history>` to define the table dimensions and the maximum undo history.
 - **Tested on:** macOS with Java 23 and IntelliJ IDEA
+
+## Testing
+
+Testing the `SimpleTableEditor` is crucial to ensure the reliability and stability of the application. Below are guidelines and requirements for setting up and executing tests effectively.
+
+### Prerequisites
+
+- **Operating System Permissions:** Ensure that your testing environment has the appropriate OS-level permissions for graphical display operations, as Swing components require access to the system's graphical resources. This is particularly important if you are running the tests on headless servers or environments where GUI operations might be restricted.
+- **Java Version:** The application and tests require Java 23, so ensure that it is installed and properly configured in your environment.
+
+### Test Execution
+
+To run the tests, you may use a command or IntelliJ IDEA's built-in test runner. Below are the steps to execute the tests using Maven:
+
+```bash
+mvn test
+```
