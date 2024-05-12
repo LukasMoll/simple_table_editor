@@ -69,8 +69,6 @@ Each formula feature is designed to provide maximum flexibility and control to t
 
 The editor includes undo functionality that allows users to revert their actions to a previous state, enhancing the flexibility and usability of the table manipulation process. This feature is crucial for managing mistakes and refining table data without having to manually reverse each change.
 
-Each formula feature is designed to provide maximum flexibility and control to the user, ensuring that SimpleTableEditor can handle a variety of data manipulation tasks effectively.
-
 ## Implementation Details
 
 ### Design Patterns and Architecture
