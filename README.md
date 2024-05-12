@@ -84,12 +84,7 @@ SimpleTableEditor employs two main design patterns to ensure a robust and scalab
   - **Memento (`TableModelSnapshot`):** Captures and externalizes the internal state of a `TableModel` at a given moment without exposing its implementation details. This snapshot includes cell values and dependencies.
   - **Caretaker (`TableController`):** Manages the memento's lifecycle. It keeps track of the history of states using a stack and provides mechanisms to restore any previously saved state.
 
-### Detailed Components
-
-- **UI Components:**
-  - **`TableModel`:** Core component of the MVC model, managing spreadsheet dimensions, cell values, and label configurations. It ensures data integrity and consistency throughout operations.
-  - **`TableView`:** Visual representation in the MVC architecture. It sets up GUI components like the table grid and editors, reacting to model updates and user interactions.
-  - **`TableController`:** Facilitates communication between the model and view, handling event-driven interactions such as cell editing and selection, and managing the undo stack for state reversals.
+### Other Components
 
 - **Expression Evaluation:**
   - **`Expr` Interface and Implementations:** Defines a family of expression types (`NumberExpr`, `BinaryExpr`, `FunctionExpr`, `CellExpr`) that the parser translates user inputs into. These objects represent different types of calculations and operations within cells.
