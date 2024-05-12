@@ -4,13 +4,14 @@ SimpleTableEditor is a lightweight Java-based application designed to facilitate
 
 ## Features
 
-
 SimpleTableEditor supports a range of formula capabilities that allow users to perform complex data manipulations directly within the table cells. Below, we detail the types of operations and functions available.
 
 ### 1. Parentheses for Controlling Operation Precedence
+
 Parentheses are used to override the default precedence of operations, ensuring that operations enclosed in them are computed first. This feature is essential for creating complex expressions that yield accurate results.
 
 ### 2. Binary and Unary Operators
+
 The editor supports the following operators to perform arithmetic and logical operations:
 
 - **Binary Operators:**
@@ -23,6 +24,7 @@ The editor supports the following operators to perform arithmetic and logical op
     - `-` (Negation): Changes the sign of the operand.
 
 ### 3. Named Functions
+
 A variety of named functions are available, ranging from trigonometric and logarithmic functions to statistical operations:
 
 - **Trigonometric Functions:**
@@ -58,6 +60,7 @@ A variety of named functions are available, ranging from trigonometric and logar
     - `SIGNUM(x)`
 
 ### 4. References to Other Cells Within the Table
+
 Formulas can reference other cells dynamically, enabling real-time data manipulation based on values from different parts of the table. The application manages these references using a dependency graph, preventing issues such as circular references.
 
 Each formula feature is designed to provide maximum flexibility and control to the user, ensuring that SimpleTableEditor can handle a variety of data manipulation tasks effectively.
