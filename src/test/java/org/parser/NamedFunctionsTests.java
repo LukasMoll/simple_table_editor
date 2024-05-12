@@ -83,6 +83,16 @@ public class NamedFunctionsTests {
     }
 
     @Test
+    public void testSinFunction() {
+        String input = "SIN(30)";
+        cell.setValue(input);
+
+        Expr expression = parser.parse(cell);
+
+        assertEquals(0.5, expression.evaluate(), 0.01, "Sine function failed");
+    }
+
+    @Test
     public void testCosFunction() {
         String input = "COS(60)";
         cell.setValue(input);
@@ -100,6 +110,146 @@ public class NamedFunctionsTests {
         Expr expression = parser.parse(cell);
 
         assertEquals(1.0, expression.evaluate(), 0.01, "Tangent function failed");
+    }
+
+    @Test
+    public void testLogFunction() {
+        String input = "LOG(10)";
+        cell.setValue(input);
+
+        Expr expression = parser.parse(cell);
+
+        assertEquals(2.302585092994046, expression.evaluate(), 0.01, "Logarithm function failed");
+    }
+
+    @Test
+    public void testExpFunction() {
+        String input = "EXP(1)";
+        cell.setValue(input);
+
+        Expr expression = parser.parse(cell);
+
+        assertEquals(Math.E, expression.evaluate(), 0.01, "Exponential function failed");
+    }
+
+    @Test
+    public void testLog10Function() {
+        String input = "LOG10(100)";
+        cell.setValue(input);
+
+        Expr expression = parser.parse(cell);
+
+        assertEquals(2.0, expression.evaluate(), 0.01, "Log10 function failed");
+    }
+
+    @Test
+    public void testRoundFunction() {
+        String input = "ROUND(2.5)";
+        cell.setValue(input);
+
+        Expr expression = parser.parse(cell);
+
+        assertEquals(3.0, expression.evaluate(), 0.01, "Round function failed");
+    }
+
+    @Test
+    public void testCeilFunction() {
+        String input = "CEIL(2.1)";
+        cell.setValue(input);
+
+        Expr expression = parser.parse(cell);
+
+        assertEquals(3.0, expression.evaluate(), 0.01, "Ceil function failed");
+    }
+
+    @Test
+    public void testFloorFunction() {
+        String input = "FLOOR(2.9)";
+        cell.setValue(input);
+
+        Expr expression = parser.parse(cell);
+
+        assertEquals(2.0, expression.evaluate(), 0.01, "Floor function failed");
+    }
+
+    @Test
+    public void testSqrtFunction() {
+        String input = "SQRT(16)";
+        cell.setValue(input);
+
+        Expr expression = parser.parse(cell);
+
+        assertEquals(4.0, expression.evaluate(), 0.01, "Square root function failed");
+    }
+
+    @Test
+    public void testAbsFunction() {
+        String input = "ABS(-5)";
+        cell.setValue(input);
+
+        Expr expression = parser.parse(cell);
+
+        assertEquals(5.0, expression.evaluate(), 0.01, "Absolute function failed");
+    }
+
+    @Test
+    public void testPowFunction() {
+        String input = "POW(2, 3)";
+        cell.setValue(input);
+
+        Expr expression = parser.parse(cell);
+
+        assertEquals(8.0, expression.evaluate(), 0.01, "Power function failed");
+    }
+
+    @Test
+    public void testModFunction() {
+        String input = "MOD(10, 4)";
+        cell.setValue(input);
+
+        Expr expression = parser.parse(cell);
+
+        assertEquals(2.0, expression.evaluate(), 0.01, "Modulo function failed");
+    }
+
+    @Test
+    public void testMaxFunction() {
+        String input = "MAX(1, 2, 3)";
+        cell.setValue(input);
+
+        Expr expression = parser.parse(cell);
+
+        assertEquals(3.0, expression.evaluate(), "Max function failed");
+    }
+
+    @Test
+    public void testMinFunction() {
+        String input = "MIN(1, 2, 3)";
+        cell.setValue(input);
+
+        Expr expression = parser.parse(cell);
+
+        assertEquals(1.0, expression.evaluate(), "Min function failed");
+    }
+
+    @Test
+    public void testSumFunction() {
+        String input = "SUM(1, 2, 3)";
+        cell.setValue(input);
+
+        Expr expression = parser.parse(cell);
+
+        assertEquals(6.0, expression.evaluate(), "Sum function failed");
+    }
+
+    @Test
+    public void testAverageFunction() {
+        String input = "AVERAGE(1, 2, 3)";
+        cell.setValue(input);
+
+        Expr expression = parser.parse(cell);
+
+        assertEquals(2.0, expression.evaluate(), "Average function failed");
     }
 
     @Test
@@ -124,33 +274,13 @@ public class NamedFunctionsTests {
     }
 
     @Test
-    public void testSqrtFunction() {
-        String input = "SQRT(16)";
+    public void testSignumFunction() {
+        String input = "SIGNUM(-5)";
         cell.setValue(input);
 
         Expr expression = parser.parse(cell);
 
-        assertEquals(4.0, expression.evaluate(), "Square root function failed");
-    }
-
-    @Test
-    public void testExpFunction() {
-        String input = "EXP(1)";
-        cell.setValue(input);
-
-        Expr expression = parser.parse(cell);
-
-        assertEquals(Math.E, expression.evaluate(), 0.01, "Exponential function failed");
-    }
-
-    @Test
-    public void testMinFunction() {
-        String input = "MIN(4, 1, 2, 3)";
-        cell.setValue(input);
-
-        Expr expression = parser.parse(cell);
-
-        assertEquals(1.0, expression.evaluate(), "Min function failed");
+        assertEquals(-1.0, expression.evaluate(), 0.01, "Signum function failed");
     }
 
     @Test
@@ -161,46 +291,6 @@ public class NamedFunctionsTests {
         Expr expression = parser.parse(cell);
 
         assertEquals(6.0, expression.evaluate(), "Max function with complex input failed");
-    }
-
-    @Test
-    public void testSumFunction() {
-        String input = "SUM(1, 2, 3)";
-        cell.setValue(input);
-
-        Expr expression = parser.parse(cell);
-
-        assertEquals(6.0, expression.evaluate(), "Sum function failed");
-    }
-
-    @Test
-    public void testAverageFunction() {
-        String input = "AVERAGE(2, 4)";
-        cell.setValue(input);
-
-        Expr expression = parser.parse(cell);
-
-        assertEquals(3.0, expression.evaluate(), "Average function failed");
-    }
-
-    @Test
-    public void testModFunction() {
-        String input = "MOD(10, 4)";
-        cell.setValue(input);
-
-        Expr expression = parser.parse(cell);
-
-        assertEquals(2.0, expression.evaluate(), "Modulo function failed");
-    }
-
-    @Test
-    public void testLog10Function() {
-        String input = "LOG10(100)";
-        cell.setValue(input);
-
-        Expr expression = parser.parse(cell);
-
-        assertEquals(2.0, expression.evaluate(), "Log10 function failed");
     }
 
     @Test

@@ -25,18 +25,16 @@ class CellTests {
 
     @Test
     public void testValueSetAndRetrieve() {
-        // Set a value and verify if it's correctly retrieved
         cell.setValue("100");
         Assertions.assertEquals("100", cell.getValue(), "Cell should store and return the same value.");
     }
 
     @Test
     public void testParsingUpdatesParsedValue() {
-        // Simulate parsing outcome
         String expectedResult = "200.0";
-        cell.setValue("100 * 2");  // Assuming the parser will correctly parse this to 200
-        cell.setParsedValue(expectedResult);  // Mocking the outcome of parsing
-        cell.parse();  // Act of parsing which should ideally set the parsed value
+        cell.setValue("100 * 2");
+        cell.setParsedValue(expectedResult);
+        cell.parse();
         Assertions.assertEquals(expectedResult, cell.getParsedValue(), "Parsed value should be updated after parsing.");
     }
 
