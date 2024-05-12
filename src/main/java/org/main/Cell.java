@@ -27,11 +27,6 @@ public class Cell {
         return new Cell(row, column, value, parsedValue, cellDependencyGraph, tableModel, parser);
     }
 
-    public void restore(Cell cell) {
-        value = cell.value;
-        parsedValue = cell.parsedValue;
-    }
-
     public void setValue(String value) {
         this.value = value;
         tableModel.handleCellUpdate(this);

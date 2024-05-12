@@ -43,10 +43,6 @@ public class TableModel {
         return cells;
     }
 
-    public TableModelSnapshot createSnapshot() {
-        return new TableModelSnapshot(this);
-    }
-
     public void restoreFromSnapshot(TableModelSnapshot snapshot) {
         snapshot.restore(this);
     }
